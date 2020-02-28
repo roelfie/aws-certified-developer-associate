@@ -174,3 +174,106 @@ An instance type includes one or more instance sizes, allowing you to scale reso
 * T2/T3 are [burstable instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/burstable-performance-instances.html)
   * If your CPU 'bursts' it costs CPU credit. If you use up a lot of CPU credit, the CPU will start underperforming.
   * Burstable performance instances in [unlimited mode](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/burstable-performance-instances-unlimited-mode.html) come with unlimited busrt credit balance (but come at a (high) cost)
+
+## [Elastic Load Balancing](https://aws.amazon.com/elasticloadbalancing/) (ELB)
+
+Functions of the 
+* Distribute traffic across multiple targets
+* Health check downstream instances
+* [SSL termination](https://avinetworks.com/glossary/ssl-termination/) (encryption / decryption)
+* [Sticky sessions](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/elb-sticky-sessions.html)
+* High availability across AZs
+* Separate public traffic from private traffic
+
+### [Types of load balancers](https://aws.amazon.com/elasticloadbalancing/features/)
+
+|                                   | Application Load Balancer  | Network Load Balancer  | Classic Load Balancer      |
+|-----------------------------------|----------------------------|------------------------|----------------------------|
+| Layer                             | Layer 7 (application)      | Layer 4 (transport)    |                            |
+| Since                             | 2016                       | 2017                   | 2009                       |
+| Protocols                         | HTTP, HTTPS                | TCP, UDP, TLS          | TCP, SSL/TLS, HTTP, HTTPS  |
+| Websockets                        | v                          | v                      | v                          |
+| IP address as target              | v                          | v                      |                            |
+| Sticky sessions                   | v                          |                        | v                          |
+| Static IP                         |                            | v                      |                            |
+| Elastic IP                        |                            | v                      |                            |
+| Redirects                         | v                          |                        |                            |
+| Fixed response                    | v                          |                        |                            |
+| Lambda function as target         | v                          |                        |                            |
+| **Content-based routing**         |                            |                        |                            |
+| Path-based routing                | v                          |                        |                            |
+| Host-based routing                | v                          |                        |                            |
+| HTTP header-based routing         | v                          |                        |                            |
+| HTTP method-based routing         | v                          |                        |                            |
+| Query string param-based routing  | v                          |                        |                            |
+| Source IP addr CIDR-based routing | v                          |                        |                            |
+| **Security**                      |                            |                        |                            |
+| Tag-based IAM permissions         | v                          | v                      |                            |
+| Resource-based IAM permissions    | v                          | v                      | v                          |
+| User Authentication               | v                          |                        |                            |
+
+All load balancers support
+* SSL or TLS (SSL offloading)
+* Health checks
+* CloudWatch metrics
+* Logging
+* Zonal fail-over
+* Cross zone load balancing
+
+:warning: All LBs have a static host name. Do never use the underlying IP address!
+
+:warning: LBs can scal, but not instantaneously (contact AWS for a "warm up" if needed)
+
+:warning: HTTP 503 means either no target, or LB has no more capacity
+
+Elastic Load Balancing [User Guide](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html#elb-features)
+
+[Target groups](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html)
+
+#### [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html)
+* Content-based routing rules (See table above)
+* Latency 400ms
+* Load balancer sets the following HTTP headers:
+  * `X-Forwarded-For`: Client IP address
+  * `X-Forwarded-Port`: Destination port the client used to connect to the LB
+  * `X-Forwarded-Proto`: Protocol the client used to connect to the LB (HTTP or HTTPS)
+* Request tracing (load balancer injects a `X-Amzn-Trace-Id` HTTP header)
+* Balancing across machines
+* Balancing across containers (applications on the same machine)
+* Good for: Microservices & container based applications (docker, Amazon ECS)
+* Port mapping feature to map to dynamic port
+* SSL certificate management (through IAM and AWS Certificate Management)
+
+#### [Network Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html)
+* High performance (millions requests/sec) and ultra-low latency (100ms)
+* Handles sudden and volatile traffic patterns
+* Integrated with AutoScaling, EC2, Cloud Formation and AWS Certificate Management (ACM)
+* Work with: EC2 instances, microservices, containers
+
+#### [Classic Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html) (deprecated)
+* Only recommended for applications built within the EC2-Classic network.
+
+### Application Load Balancer configuration for EC2 instances
+
+Example of an AWS EC2 configuration with two instances hosting a web application on port 81:
+
+* www: HTTP request on port 80 (@load balancer DNS name)
+  * (security group allowing port 80) -> Application Load Balancer
+    * Target Group
+      * configured to forward HTTP traffic to port 81 on EC2 instances (in specified AZs)
+      * the following EC2 instances are registered in the target group:
+        * (security group allowing port 81) EC2 instance 1 (AZ a)
+        * (security group allowing port 81) EC2 instance 2 (AZ b)
+
+By default an EC2 instance is given a public IP address. If you want to allow inbound traffic only via the load balancer, configure the EC2 instance's security group as follows:
+* Type = Custom TCP rule
+* Port range = 81 (example)
+* Source
+  * Custom
+  * In the value you can type in the Name or Id of the load balancer's security group
+
+
+
+
+
+
