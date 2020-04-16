@@ -177,7 +177,7 @@ Blog post: [Cache vs. Session store](https://redislabs.com/blog/cache-vs-session
 
 These are not two muutually exclusive strategies: Lazy loading says that objects are added to the cache _on read_, Write-through says that objects are added to the cache _on write_. Neither case guarantees that the cache is complete at any given point in time. You could combine the two strategies.
 
-## VPC
+## :white_check_mark: VPC
 
 VPC (Virtual Private Cloud) provisions a logically isolated section of the AWS Cloud (a virtual network).
 * [Overview](https://aws.amazon.com/vpc/)
