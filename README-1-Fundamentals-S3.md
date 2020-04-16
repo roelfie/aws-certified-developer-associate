@@ -1,8 +1,12 @@
 # Fundamentals - S3
 
-## S3
+## :white_check_mark: S3
 
-[Simple Cloud Storage Service](https://aws.amazon.com/s3/) (S3) is an object storage service ([User guide](https://docs.aws.amazon.com/s3/) and [Developer guide](https://docs.aws.amazon.com/AmazonS3/latest/dev/Welcome.html)).
+S3 (Simple Cloud Storage Service) is an object storage service.
+* [Overview](https://aws.amazon.com/s3/)
+* [User Guide](https://docs.aws.amazon.com/s3/)
+* [Developer Guide](https://docs.aws.amazon.com/AmazonS3/latest/dev/Welcome.html)
+---
 
 ### Buckets and Objects
 
@@ -31,7 +35,7 @@ Objects
 
 ### Object versioning
 * Set at bucket level (for all files, or none)
-* Versions is a base64 encoded string (not sequential numbers)
+* Version is a base64 encoded string (not sequential numbers)
 * Benefits: delete protection & easy rollback to previous version
 * Unversioned objects (uploaded before enabling versioning) have version 'null'
 
@@ -85,6 +89,16 @@ You can also define default encryption for the bucket (in which case you don't s
 
 :warning: server-side encryption in S3 encrypts only the object, not the meta-data!
 
+### Security
+
+This section is about S3 [security](https://docs.aws.amazon.com/AmazonS3/latest/dev/security.html) and [access management](https://docs.aws.amazon.com/AmazonS3/latest/dev/s3-access-control.html) in particular.
+
+By default, all S3 resources are private (only accessible to the AWS account that created it). The resource owner can optionally grant access permissions to others by writing an access policy. There are two kinds of access policies:
+* [user policies]() (IAM policies): 
+* [resource-based policies](): 
+  * Bucket policies
+  * Object ACL (Access Control List)
+  * Bucket ACL
 
 
 

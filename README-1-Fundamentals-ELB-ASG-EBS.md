@@ -1,6 +1,12 @@
 # Fundamentals - ELB, ASG & EBS
 
-## [Elastic Load Balancing](https://aws.amazon.com/elasticloadbalancing/) (ELB)
+
+## :white_check_mark: Elastic Load Balancing (ELB)
+
+* [Overview](https://aws.amazon.com/elasticloadbalancing/)
+* [User Guide](https://docs.aws.amazon.com/elasticloadbalancing/)
+* [User Guide (Application Locad Balancer)](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html)
+---
 
 Functions of a load balancer:
 * Distribute traffic across multiple targets
@@ -10,7 +16,9 @@ Functions of a load balancer:
 * High availability across AZs
 * Separate public traffic from private traffic
 
-### [Types of load balancers](https://aws.amazon.com/elasticloadbalancing/features/)
+### Overview
+
+Below is a [comparison](https://aws.amazon.com/elasticloadbalancing/features/) of Amazon's load balancers:
 
 |                                   | Application Load Balancer  | Network Load Balancer  | Classic Load Balancer      |
 |-----------------------------------|----------------------------|------------------------|----------------------------|
@@ -37,7 +45,7 @@ Functions of a load balancer:
 | Resource-based IAM permissions    | v                          | v                      | v                          |
 | User Authentication               | v                          |                        |                            |
 
-All load balancers support
+All load balancers support:
 * SSL or TLS (SSL offloading)
 * Health checks
 * CloudWatch metrics
@@ -51,11 +59,10 @@ All load balancers support
 
 :warning: HTTP 503 means either no target, or LB has no more capacity
 
-Elastic Load Balancing [User Guide](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html#elb-features)
+#### Application Load Balancer
 
-[Target groups](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-target-groups.html)
+The [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html) is the most flexible load balancer that works with EC2 and ECS (Elastic Container Service). It supports HTTP / HTTPS and integrates with EC2 Autoscaling, CloudWatch, Route 53, AWS WAF.
 
-#### [Application Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html)
 * Content-based routing rules (See table above)
 * Latency 400ms
 * Load balancer sets the following HTTP headers:
@@ -69,16 +76,20 @@ Elastic Load Balancing [User Guide](https://docs.aws.amazon.com/elasticloadbalan
 * Port mapping feature to map to dynamic port
 * SSL certificate management (through IAM and AWS Certificate Management)
 
-#### [Network Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html)
+#### Network Load Balancer
+
+The [Network Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html) is a high-performance low-latency load balancer. Like the Application Load Balancer, it can be set up to work with EC2 and ECS.
+
 * High performance (millions requests/sec) and ultra-low latency (100ms)
 * Handles sudden and volatile traffic patterns
 * Integrated with AutoScaling, EC2, Cloud Formation and AWS Certificate Management (ACM)
 * Work with: EC2 instances, microservices, containers
 
-#### [Classic Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html) (deprecated)
-* Only recommended for applications built within the EC2-Classic network.
+#### Classic Load Balancer
 
-### Application Load Balancer configuration for EC2 instances
+The [Classic Load Balancer](https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html) is deprecated. It is only recommended for applications built within the EC2-Classic network.
+
+### Configuration of an Application Load Balancer for EC2 instances
 
 Example of an AWS EC2 configuration with two instances hosting a web application on port 81:
 
@@ -97,9 +108,14 @@ By default an EC2 instance is given a public IP address. If you want to allow in
   * Custom
   * In the value you can type in the Name or Id of the load balancer's security group
 
-## EC2 Auto Scaling
+## :white_check_mark: EC2 Auto Scaling
 
-EC2 [Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html) (ASG) allows you to ensure that you have the correct number of instances available to handle the load for your application.
+EC2 Auto Scaling (ASG) allows you to ensure that you have the correct number of instances available to handle the load for your application.
+* [Overview](https://aws.amazon.com/autoscaling/)
+* [User Guide](https://docs.aws.amazon.com/autoscaling/ec2/userguide)
+---
+
+Summary:
 * Scale out (add instance) and in (remove instance) as load changes over time
 * Based on (CloudWatch) alarms
   * avg. CPU
@@ -132,10 +148,11 @@ EC2 [Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is
 
 Bottom line: Using a non-empty target group in a new ASG will lead to confusion.
 
-## Elastic Block Store (EBS)
+## :white_check_mark: Elastic Block Store (EBS)
 
-* [EBS](https://aws.amazon.com/ebs)
-* Elastic Block Store [User Guide](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html)
+* [Overview](https://aws.amazon.com/ebs)
+* [User Guide](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html)
+---
 
 * Network drive (not a physical drive)
 * Easily detached from one instance and attached to another

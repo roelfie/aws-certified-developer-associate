@@ -1,13 +1,18 @@
 # Fundamentals - Route53, RDS & VPC
 
-## Route 53
+## :white_check_mark: Route 53
 
-[Route 53](https://aws.amazon.com/route53/) is Amazon's [DNS](https://aws.amazon.com/route53/what-is-dns/) service ([User guide](https://docs.aws.amazon.com/route53/)).
+Route53 is Amazon's DNS service.
+* [Overview](https://aws.amazon.com/route53/)
+* [User Guide](https://docs.aws.amazon.com/route53/)
+* [DNS](https://aws.amazon.com/route53/what-is-dns/)
+---
 
 With Route 53 you can
-1. Register domain names
+1. register domain names
 2. route internet traffic
 3. health check your resources
+
 
 Route 53 connects user to 
 * AWS resources (EC2 instances, ELB load balancers, S3 buckets, ..)
@@ -56,16 +61,22 @@ Mapping your domain to an Application Load Balancer:
   * Alias = Yes
   * Alias Target = <ALB>
 
-## RDS
 
-[Relational Database Service](https://aws.amazon.com/rds/) (RDS) allows you to set up, operate and scale a relational database ([User guide](https://docs.aws.amazon.com/rds/))
+## :white_check_mark: RDS
+
+RDS allows you to set up, operate and scale a relational database.
+* [Overview](https://aws.amazon.com/rds/)
+* [User Guide](https://docs.aws.amazon.com/rds/)
+---
+
+Supported databases:
 * Postgres
 * MySQL
 * Oracle, SQL Server
 * MariaDB (fork of MySQL; open source)
 * Aurora (AWS cloud optimized RDBMS) has its own [user guide](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html)
 
-Advantages of using RDS over deploying your own database on an EC2 instance
+Advantages of using RDS over deploying your own database on an EC2 instance:
 * OS patching
 * Automatic backups
   * daily full snapshot
@@ -87,9 +98,11 @@ Advantages of using RDS over deploying your own database on an EC2 instance
 * Scaling (vertical and horizontal)
 * They are managed services; you can't ssh into them and can't interact directly
 
-### [RDS Security](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.html)
+### RDS Security
 
-You can [encrypt](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Encryption.html) your RDS instance
+User Guide > [Security in Amazon RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.html)
+
+You can [encrypt](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Encryption.html) your RDS instance:
 * [At rest](): AWS KMS with AES-256 encryption
 * [In-flight](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.SSL.html) using SSL certificates
   * [Oracle](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Oracle.html#Oracle.Concepts.SSL) use the `SQLNET.SSL_VERSION` option
@@ -107,7 +120,7 @@ Usually deployed in a private subnet.
 
 ### Aurora
 
-[User guide](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html)
+User guide > [What is Amazon Aurora](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html)
 
 * Compatible with Postgres and MySQL (meaning that you can use a Postgres or MySQL driver to connect)
 * Cloud optimized (5x MySQL, 3x Postgres)
@@ -123,7 +136,12 @@ Usually deployed in a private subnet.
 * Cassandra
 * SQLite
 
-## ElastiCache
+## :white_check_mark: ElastiCache
+
+ElastiCache is an in-memory NoSQL database (key-value store).
+* [Overview](https://aws.amazon.com/elasticache/)
+* [User Guide](https://docs.aws.amazon.com/elasticache/) 
+---
 
 NoSQL represents a category of database that can be categorized as follows:
 * document (MongoDB)
@@ -131,7 +149,7 @@ NoSQL represents a category of database that can be categorized as follows:
 * graph (Neo4J)
 * column-based (Cassandra)
 
-[ElastiCache](https://aws.amazon.com/elasticache/) ([User guide](https://docs.aws.amazon.com/elasticache/)) is an in-memory key-value store based on either 
+ElastiCache is an in-memory key-value store based on either 
 * [Redis](https://redis.io/)
 * [Memcached](https://memcached.org/)
 
@@ -161,7 +179,10 @@ These are not two muutually exclusive strategies: Lazy loading says that objects
 
 ## VPC
 
-[Virtual Private Cloud](https://aws.amazon.com/vpc/) (VPC) provisions a logically isolated section of the AWS Cloud (a virtual network) ([User guide](https://docs.aws.amazon.com/vpc/)).
+VPC (Virtual Private Cloud) provisions a logically isolated section of the AWS Cloud (a virtual network).
+* [Overview](https://aws.amazon.com/vpc/)
+* [User guide](https://docs.aws.amazon.com/vpc/)
+---
 
 A VPC
 * is tied to a region

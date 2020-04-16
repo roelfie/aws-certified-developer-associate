@@ -1,6 +1,6 @@
 # Fundamentals - IAM & EC2
 
-## Regions and zones
+## :white_check_mark: Regions and zones
 
 [Regions and Availability Zones](https://aws.amazon.com/about-aws/global-infrastructure/regions_az/)
 
@@ -15,30 +15,41 @@
   - AZs in the same are region are witin 100km of each other
   - low latency, sufficient for synchronous replication between AZs
 
-## IAM
+## :white_check_mark: IAM
 
-[Identity and Access Management](https://aws.amazon.com/iam/)
+IAM (Identity and Access Management):
+* [Overview](https://aws.amazon.com/iam/)
+* [User Guide](https://docs.aws.amazon.com/iam/)
+---
 
-* Users
-* Groups
-* Roles (used in AWS services and resources)
-* Permissions are governed by Policies
-  * Written in JSON
-  * Predefined 'management policies'
-* [Best practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
-* [IAM federation](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers.html) is all about
-  * [Integrating Third-Party SAML Solution Providers with AWS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_saml_3rd-party.html), for instance
-  * [Okta](https://help.okta.com/en/prod/Content/Topics/DeploymentGuides/AWS/aws-deployment.htm)
-  * [OneLogin](https://www.onelogin.com/partners/technology-partners/aws)
+IAM is all about Users, Groups and Roles. Roles are used in AWS services and resources for authorisation.
+
+Permissions are governed by Policies
+* Written in JSON
+* Predefined 'management policies'
+
+[Best practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html):
 * Do not use the same role for more than 1 application
 * Use the root account _only_ for initial setup!
 
-## EC2
+[IAM federation](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers.html) is all about:
+* [Integrating Third-Party SAML Solution Providers with AWS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_saml_3rd-party.html), like
+  * [Okta](https://help.okta.com/en/prod/Content/Topics/DeploymentGuides/AWS/aws-deployment.htm)
+  * [OneLogin](https://www.onelogin.com/partners/technology-partners/aws)
 
-[Elastic Compute Cloud](https://docs.aws.amazon.com/ec2/index.html) (EC2)
-* [Elastic Load Balancing](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html) (ELB)
-* [Elastic Block Storage](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html) (EBS)
-* [Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html) (ASG)
+## :white_check_mark: EC2
+
+EC2 (Elastic Compute Cloud) provides resizable compute capacity in the cloud.
+* [Overview](https://aws.amazon.com/ec2/)
+* [User Guide](https://docs.aws.amazon.com/ec2/)
+---
+
+Features of EC2:
+* [Auto Scaling](https://docs.aws.amazon.com/autoscaling/ec2/userguide/) (ASG)
+* [Elastic Block Storage](https://aws.amazon.com/ebs) (EBS)
+* [Elastic Load Balancing](https://aws.amazon.com/elasticloadbalancing/) (ELB)
+
+(more details on ASG, EBS and ELB later on (other README))
 
 Options when configuring an EC2 instance:
 * [Spot Instance](https://aws.amazon.com/ec2/spot/) (save <=90% on flexible interuption-tolerant apps)
@@ -137,7 +148,9 @@ A [user data](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
     * Workloads resilient to failures
     * _Not_ for critical jobs, databases, etc.
 
-### More EC2 facts
+---
+
+### More on EC2
 
 #### Pricing
 * EC2 prices vary per region, instance type, launch mode, OS, ..
