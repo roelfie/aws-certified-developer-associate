@@ -55,7 +55,7 @@ All load balancers support:
 
 :warning: All LBs have a static host name. Do never use the underlying IP address!
 
-:warning: LBs can scal, but not instantaneously (contact AWS for a "warm up" if needed)
+:warning: LBs can scale, but not instantaneously (contact AWS for a "warm up" if needed)
 
 :warning: HTTP 503 means either no target, or LB has no more capacity
 
