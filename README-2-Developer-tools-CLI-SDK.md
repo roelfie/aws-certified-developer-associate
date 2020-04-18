@@ -37,13 +37,45 @@ Default output format [None]:
 
 This will generate files `config` and `credentials` in folder `~/.aws`.
 
+### CLI profiles
+
+If you are using the CLI to access different AWS environments from the same workstation, you can use profiles to distinguish between them. Profiles are specified with the `--profile` flag. 
+
+#### Default profile 
+
+If you don't specify a profile, the CLI will use the default profile (called `default` by default).
+
+You can specify the default profile using the `$AWS_PROFILE` environment variable. So if you do `export AWS_PROFILE=profileX` then, whenver you omit the `--profile` flag, the CLI will use the profile `profileX`.
+
+:warning: If you use multiple profiles, it is safest to not use this environment variable, because it hides what is happening 'under the hood'. You might end up executing commands on another environment than expected without noticing. Just provide the `--profile` flag.
+
+:warning: If you do want to set a default profile in `$AWS_PROFILE` make sure to use the environment that you can do the least damage to (in other words: make our private AWS environment the default, instead of your company's).
+
+#### Defining a profile
+
+This will configure the `default` profile (unless it's called otherwise in `$AWS_PROFILE`):
+```
+$ aws configure
+```
+
+And this will configure a profile called `myCompany`:
+```
+$ aws configure --myCompany
+```
+
+Profile information is stored in `~/.aws` (files `config` and `credentials`).
+
+#### Using a profile
+```
+$ aws s3 ls --profile environmentA
+```
+
 ### Example: S3 CLI
 
 * [User Guide (S3 CLI)](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-s3.html)
   * [`s3` commands](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-s3-commands.html) provide high-level commands for common operations (create, delete, list, ..)
   * [`s3api` commands](https://docs.aws.amazon.com/cli/latest/userguide/cli-services-s3-apicommands.html) provide direct access to the S3 APIs, and enable some operations that are not available in the s3 commands
 
-:warning: Make sure to remove (or backup) any existing `credentials` files before doing `aws configure`. Otherwise credentials might get mixed up (e.g. existing onelogin settings) and you will get trouble connecting to AWS.
 
 ```
 $ aws s3 ls
@@ -149,40 +181,6 @@ $ curl http://169.254.169.254/latest/meta-data/iam/security-credentials/Roelfie-
   "Expiration" : "2020-04-17T20:19:02Z"
 }
 ```
-
-### CLI profiles
-
-If you are using the CLI to access different AWS environments from the same workstation, you can use profiles to distinguish between them. Profiles are specified with the `--profile` flag. 
-
-#### Default profile 
-
-If you don't specify a profile, the CLI will use the default profile (called `default` by default).
-
-You can specify the default profile using the `$AWS_PROFILE` environment variable. So if you do `export AWS_PROFILE=profileX` then, whenver you omit the `--profile` flag, the CLI will use the profile `profileX`.
-
-:warning: If you use multiple profiles, it is safest to not use this environment variable, because it hides what is happening 'under the hood'. You might end up executing commands on another environment than expected without noticing. Just provide the `--profile` flag.
-
-:warning: If you do want to set a default profile in `$AWS_PROFILE` make sure to use the environment that you can do the least damage to (in other words: make our private AWS environment the default, instead of your company's).
-
-#### Defining a profile
-
-This will configure the `default` profile (unless it's called otherwise in `$AWS_PROFILE`):
-```
-$ aws configure
-```
-
-And this will configure a profile called `myCompany`:
-```
-$ aws configure --myCompany
-```
-
-Profile information is stored in `~/.aws` (files `config` and `credentials`).
-
-#### Using a profile
-```
-$ aws s3 ls --profile environmentA
-```
-
 
 
 ## :white_check_mark: SDK
