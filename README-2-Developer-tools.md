@@ -158,5 +158,15 @@ $ curl http://169.254.169.254/latest/meta-data/iam/security-credentials/Roelfie-
 * [User Guide (Java)](https://docs.aws.amazon.com/sdk-for-java/v2/developer-guide/welcome.html)
 * [User Guide (Boto3)](https://boto3.amazonaws.com/v1/documentation/api/latest/index.html)
 
-## :white_check_mark: Roles & Policies
+Some facts
+* The AWS CLI uses the Python SDK (boto3).
+* Default region in the SDK is `us-east-1`
+* For authentication it's recommended to use **default dredential provider chain**; integrates with
+  * `~/.aws/credentials` (also used by the CLI) 
+  * Instance Profile Credentials using IAM roles (EC2 instances, ..)
+  * Environment variables (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
+* SDK implements exponential backoff
+  * applies to rate limited APIs
+  * retry if API call fails because of too many calls
+
 
