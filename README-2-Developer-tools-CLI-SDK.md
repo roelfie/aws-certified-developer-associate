@@ -1,4 +1,4 @@
-# Developer Tools
+# Developer Tools (CLI, SDK)
 
 ## :white_check_mark: CLI
 
@@ -133,7 +133,7 @@ An error occurred (AccessDenied) when calling the DecodeAuthorizationMessage ope
 
 You need the proper STS permissions to perform `decode-authorization-message`. With the proper permissions it would have returned a JSON document containing error details.
 
-#### EC2 Instance Metadata
+### EC2 Instance Metadata
 
 Every EC2 instance has an internal endpoint `http://169.254.169.254/latest/meta-data` where it can lookup metadata about itself. Example of the description of a role in the meta-data:
 
@@ -149,6 +149,41 @@ $ curl http://169.254.169.254/latest/meta-data/iam/security-credentials/Roelfie-
   "Expiration" : "2020-04-17T20:19:02Z"
 }
 ```
+
+### CLI profiles
+
+If you are using the CLI to access different AWS environments from the same workstation, you can use profiles to distinguish between them. Profiles are specified with the `--profile` flag. 
+
+#### Default profile 
+
+If you don't specify a profile, the CLI will use the default profile (called `default` by default).
+
+You can specify the default profile using the `$AWS_PROFILE` environment variable. So if you do `export AWS_PROFILE=profileX` then, whenver you omit the `--profile` flag, the CLI will use the profile `profileX`.
+
+:warning: If you use multiple profiles, it is safest to not use this environment variable, because it hides what is happening 'under the hood'. You might end up executing commands on another environment than expected without noticing. Just provide the `--profile` flag.
+
+:warning: If you do want to set a default profile in `$AWS_PROFILE` make sure to use the environment that you can do the least damage to (in other words: make our private AWS environment the default, instead of your company's).
+
+#### Defining a profile
+
+This will configure the `default` profile (unless it's called otherwise in `$AWS_PROFILE`):
+```
+$ aws configure
+```
+
+And this will configure a profile called `myCompany`:
+```
+$ aws configure --myCompany
+```
+
+Profile information is stored in `~/.aws` (files `config` and `credentials`).
+
+#### Using a profile
+```
+$ aws s3 ls --profile environmentA
+```
+
+
 
 ## :white_check_mark: SDK
 
