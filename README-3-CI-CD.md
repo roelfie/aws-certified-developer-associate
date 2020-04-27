@@ -158,7 +158,7 @@ $ aws codepipeline update-pipeline --cli-input-json file://pipeline.json
     * :warning: CodePipeline integration with GitHub Enterprise is not supported
   * **Amazon ECR**: 
     * Docker images
-  * ** AWS CodeStar connections**:
+  * **AWS CodeStar connections**:
     * Installing the CodeStar app with a 3rd party code repository allows you to  grant your pipeline access to that 3rd party repo
 * Build
   * **AWS CodeBuild**
@@ -287,10 +287,10 @@ Strengths of CodeDeploy:
 ### Configuration options
 * minimum number of healthy instances for 'success'
 * AWS Lambda: Specify how traffic is routed to different versions
-* Update mode
-  * One at a time
-  * Batch-wise (e.g. 50% at a time)
-  * All at once (good for development)
+* Pre-defined deployment configurations
+  * OneAtATime
+  * HalfAtATime
+  * AllAtOnce
 * Failed instances
   * Leave failed instances in failed state
   * First deploy to failed instances (default?)
@@ -321,36 +321,85 @@ An AppSpec file consists of:
 * [Hooks section](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html): Depending on the target environment, a different set of lifecycle event hooks apply:
   * [ECS](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#appspec-hooks-ecs) - [run order](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-run-order-ecs)
     * Start (*)
-    * BeforeInstall
-    * Install (*)
-    * AfterInstall
-    * AllowTestTraffic (*)
-    * AfterAllowTestTraffic
-    * BeforeAllowTraffic
-    * AllowTraffic (*)
-    * AfterAllowTraffic
+    * [Before|After]Install (*)
+    * [After]AllowTestTraffic (*)
+    * [Before|After]AllowTraffic (*)
     * End (*)
   * [Lambda](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#appspec-hooks-lambda) - [run order](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-run-order-lambda)
     * Start (*)
-    * BeforeAllowTraffic
-    * AllowTraffic (*)
-    * AfterAllowTraffic
+    * [Before|After]AllowTraffic (*)
     * End (*)
   * [EC2](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#appspec-hooks-server) - [run order](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-run-order):
     * Start (*)
     * [Before|After]BlockTraffic (**)
     * ApplicationStop
     * DownloadBundle (*)
-    * BeforeInstall
-    * Install (*)
-    * AfterInstall
+    * [Before|After]Install (*)
     * ApplicationStart
     * ValidateService
     * [Before|After]AllowTraffic (**)
     * End (*)
 
 Footnotes:
-* (*) Can not be scripted
+* (*) Can not be scripted (but the Before & After hooks can be scripted)
 * (**) Only with Classic LoadBalancer in the deployment group
+
+### Hands-on
+
+1. IAM: Create service roles for CodeDeploy and EC2
+   * Create a 'CodeDeploy' Service Role 
+   * Create an 'EC2' Service Role (used by EC2 to run the CodeDeploy agent) with access policies:
+     * AmazonS3ReadOnlyAccess (download deployable artifacts)
+3. EC2: Launch new instance 
+   * Amazon Linux 2 AMI (t2.micro)
+   * IAM Role: the one created in step 2
+   * Security Group: New rule allowing access over HTTP:80
+   * Tag: environment=dev (used later on in CodeDeploy deployment groups)
+   * Save & launch
+4. Installing CodeDeploy Agent
+   * SSH into the EC2 instance
+   * [Install CodeDeploy agent](https://docs.aws.amazon.com/codedeploy/latest/userguide/codedeploy-agent-operations-install.html):
+```
+sudo yum update
+sudo yum install ruby
+sudo yum install wget
+cd /home/ec2-user
+wget https://aws-codedeploy-eu-west-3.s3.eu-west-3.amazonaws.com/latest/install
+chmod +x ./install
+sudo ./install auto
+sudo service codedeploy-agent start
+sudo service codedeploy-agent status
+```
+5. S3
+   * Create a bucket where CodeDeploy can download its deployables
+   * Upload your deployable
+6. CodeDeploy
+   * Create **application**
+     * Compute type: EC2 / on-premises
+   * Create **deployment group** (typically dev / test / prod / ..)
+     * Group name: dev
+     * Service role: The one from step 1
+     * Deployment type: In-place (as opposed to Blue/Green)
+     * EC2 Instances: key=environment / value=dev
+   * Create **deployment**
+     * Deployment group from previous step
+     * Revision type: The S3 bucket from previous step
+     * Revision location: The URL to the object in the S3 bucket
+
+
+
+## :white_check_mark: CodeStar
+
+AWS CodeStar is an integrated solution that regroups GitHub, CodeCommit, CodeBuild, CodeDeploy, CloudFormation, CodePipeline, CloudWatch. It provides a unified user interface. It comes with a project management dashboard powered by Atlassian JIRA. No additional costs, you only pay for the AWS resources that you provision with CodeStar.
+
+* [Overview](https://aws.amazon.com/codestar/)
+---
+
+CodeStar is not available in eu-west-3 (Paris). But it is available in eu-west-1 (Ireland).
+
+* CI/CD-ready projects for EC2, Lambda and BeanStalk
+* Supported languages: HTML5, Java, Node.js, Python, ..
+* Issue tracking with JIRA or GitHub issues
+* One integrated dashboard, but with limited customization
 
 
