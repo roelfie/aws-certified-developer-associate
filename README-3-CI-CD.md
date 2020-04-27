@@ -1,5 +1,7 @@
 # CI/CD
 
+Read the [introduction to DevOps and AWS](https://aws.amazon.com/devops/).
+
 Possible technology stacks for CI/CD on AWS:
 
 Code               | Build / Test  | Deploy / Provision
@@ -191,9 +193,13 @@ $ aws codepipeline update-pipeline --cli-input-json file://pipeline.json
 
 ## :white_check_mark: CodeBuild
 
+CodeBuild compiles source code, runs unit tests, and produces artifacts.
+
 * [Overview](https://aws.amazon.com/codebuild/)
 * [User Guide](https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html)
 ---
+
+You can run CodeBuild dirctly (console, CLI or SDK). Or you can include it in the build or test stage of a CodePipeline (using action provider = AWS CodeBuild). 
 
 * Pay per build (with Jenkins you would still pay for the entire day, even if you do just one build a day)
 * Leverages Docker
@@ -218,8 +224,133 @@ What it needs to run CodeBuild:
 
 With [CodeBuild Agent](https://docs.aws.amazon.com/codebuild/latest/userguide/use-codebuild-agent.html) you can run CodeBuild locally (from a Docker image).
 
+### buildspec.yml
+
+See the [Build specification reference](https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html).
+
+* The buildspec can be included in the source code, but it can also be defined in your build project itself.
+* Do not store sensitive information in the `env.variables` section. Use one of: 
+  * `env.parameter_store` (EC2 [Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html)):. You CodeBuild service role should have action `ssm:GetParameters`. 
+  * `env.secrets_manager` (AWS [Secrets Manager](https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html))
+* The environment variable name prefix `CODEBUILD_` is reserved for internal use.
+
+Example `buildspec.yml` (the build will fail if the command in the build phase returns with an error code):
+```
+version: 0.2
+
+env:
+  variables: 
+    my-key: "my-value"
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+  pre_build:
+    commands:
+      - echo "Doing nothing in the pre-build phase."
+  build:
+    commands:
+      - grep -Fq "Congratulations" index.html
+```
+
 ## :white_check_mark: CodeDeploy
+
+Exam focus:
+* `appspec.yml` location and basic structure (File vs. Hooks section)
+* How deployment groups work
+* Lifecycle event hook order
+* ASG vs. tag based deployment
+
+CodeDeploy is a service that automates application deployments to EC2 instances, ECS, serverless Lambda functions or on-premises instances.
 
 * [Overview](https://aws.amazon.com/codedeploy/)
 * [User Guide](https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html)
+---
+
+Equivalent of 3rd party deployment tools like:
+* Ansible
+* Terraform
+* Chef
+* Puppet
+
+Strengths of CodeDeploy:
+* Avoid downtime (rolling updates)
+* Integrates with CodePipeline
+* Supports rolling out
+  * code
+  * AWS Lambda functions
+  * packages (like WARs)
+  * web & configuration files
+  * executables, scripts, multimedia files, ..
+
+### Configuration options
+* minimum number of healthy instances for 'success'
+* AWS Lambda: Specify how traffic is routed to different versions
+* Update mode
+  * One at a time
+  * Batch-wise (e.g. 50% at a time)
+  * All at once (good for development)
+* Failed instances
+  * Leave failed instances in failed state
+  * First deploy to failed instances (default?)
+* Deployment targets:
+  * To a set of EC2 instances with certain tag
+  * Directly to an ASG
+  * Mix of ASG and tags
+
+NB: CodeDeploy does not provision resources. It only does the deployment.
+
+### CodeDeploy agent
+To be able to roll out deployments on EC2 each EC2 instance must be running  CodeDeploy Agent:
+1. agent polls with AWS CodeDeploy for work to do
+2. CodeDeploy sends `appspec.yml`
+3. deployable is downloaded from S3 / GitHub / ..
+4. agent runs deployment instructions on the EC2 instance
+5. status will be reported back to AWS CodeDeploy
+
+In an EC2 cluster, EC2 instances are grouped into *deployment groups* (e.g. dev, test, prod).
+
+### appspec.yml
+
+The [AppSpec file](https://docs.aws.amazon.com/codedeploy/latest/userguide/application-specification-files.html) is used to manage each deployment as a series of lifecycle event hooks ([Reference](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html)).
+
+
+An AppSpec file consists of:
+* File section: How to copy from S3 / GitHub to filesystem
+* [Hooks section](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html): Depending on the target environment, a different set of lifecycle event hooks apply:
+  * [ECS](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#appspec-hooks-ecs) - [run order](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-run-order-ecs)
+    * Start (*)
+    * BeforeInstall
+    * Install (*)
+    * AfterInstall
+    * AllowTestTraffic (*)
+    * AfterAllowTestTraffic
+    * BeforeAllowTraffic
+    * AllowTraffic (*)
+    * AfterAllowTraffic
+    * End (*)
+  * [Lambda](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#appspec-hooks-lambda) - [run order](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-run-order-lambda)
+    * Start (*)
+    * BeforeAllowTraffic
+    * AllowTraffic (*)
+    * AfterAllowTraffic
+    * End (*)
+  * [EC2](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#appspec-hooks-server) - [run order](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file-structure-hooks.html#reference-appspec-file-structure-hooks-run-order):
+    * Start (*)
+    * [Before|After]BlockTraffic (**)
+    * ApplicationStop
+    * DownloadBundle (*)
+    * BeforeInstall
+    * Install (*)
+    * AfterInstall
+    * ApplicationStart
+    * ValidateService
+    * [Before|After]AllowTraffic (**)
+    * End (*)
+
+Footnotes:
+* (*) Can not be scripted
+* (**) Only with Classic LoadBalancer in the deployment group
+
 
